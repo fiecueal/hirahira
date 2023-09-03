@@ -6,7 +6,6 @@ def launch args
     y: 0,
     w: 10,
     h: 10,
-    dy: 12,
     ttl: rand(20) + 10,
     start: args.state.tick_count,
     peak: rand(250) + 300,
@@ -19,14 +18,20 @@ end
 
 def calc args
   args.state.sparks.reverse_each do |spark|
-    spark.ttl -= 1
-    args.state.sparks.delete spark if spark.ttl <= 0
+    spark.a = 111 * args.easing.ease(spark.start,
+                                     args.state.tick_count,
+                                     spark.ttl,
+                                     :flip)
+    args.state.sparks.delete spark if spark.a.zero?
     spark.angle += spark.ttl
     spark.y -= spark.ttl
   end
 
   args.state.shoots.reverse_each do |shoot|
-    shoot.y = shoot.peak * args.easing.ease(shoot.start, args.state.tick_count, shoot.ttl, :flip, :quad, :flip)
+    shoot.y = shoot.peak * args.easing.ease(shoot.start,
+                                            args.state.tick_count,
+                                            shoot.ttl,
+                                            :flip, :quad, :flip)
     args.state.shoots.delete shoot if shoot.y == shoot.peak
     shoot.x += Math.cos(args.state.tick_count) * 3
     3.times do |i|
@@ -36,14 +41,11 @@ def calc args
         y: shoot.y,
         w: size,
         h: size,
-        dy: 1,
         ttl: 12,
-        # r: 222,
-        # g: 222,
-        # b: 222,
+        start: args.state.tick_count,
         a: 111,
         angle: rand(360),
-        path: rand > 0.7 ? "sprites/square/orange.png" : "sprites/square/red.png"
+        path: rand > 0.5 ? "sprites/square/orange.png" : "sprites/square/red.png"
       }
     end
   end
@@ -59,7 +61,7 @@ def tick args
 
   calc args
 
-  launch args if args.inputs.keyboard.key_down.char && args.state.shoots.size < 5
+  launch args if args.state.sparks.empty?
 
   args.outputs.background_color = [ 11, 17, 23 ]
   args.outputs.sprites << [ args.state.sparks ]
