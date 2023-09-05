@@ -1,14 +1,15 @@
 GRAVITY = -0.01
 
 def launch args
+  peak = rand(250) + 300
   args.state.shoots << {
     x: rand(1081) + 100, # cus apparently mruby doesn't accept ranges for rand
     y: 0,
     w: 10,
     h: 10,
-    ttl: rand(20) + 10,
+    ttl: peak / 13,
     start: args.state.tick_count,
-    peak: rand(250) + 300,
+    peak: peak,
     r: 222,
     g: 222,
     b: 222,
@@ -16,7 +17,7 @@ def launch args
   }
 end
 
-def calc args
+def tick_sparks args
   args.state.sparks.reverse_each do |spark|
     spark.a = 111 * args.easing.ease(spark.start,
                                      args.state.tick_count,
@@ -26,7 +27,9 @@ def calc args
     spark.angle += spark.ttl
     spark.y -= spark.ttl
   end
+end
 
+def tick_shoots args
   args.state.shoots.reverse_each do |shoot|
     shoot.y = shoot.peak * args.easing.ease(shoot.start,
                                             args.state.tick_count,
@@ -51,15 +54,18 @@ def calc args
   end
 end
 
-def tick args
-  unless args.state.initialized
-    args.state.blooms = []
-    args.state.shoots = []
-    args.state.sparks = []
-    args.state.initialized = true
-  end
+def tick_blooms args
 
-  calc args
+end
+
+def tick args
+  args.state.blooms ||= []
+  args.state.shoots ||= []
+  args.state.sparks ||= []
+
+  tick_blooms args
+  tick_shoots args
+  tick_sparks args
 
   launch args if args.state.sparks.empty?
 
