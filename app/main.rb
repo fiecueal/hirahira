@@ -26,8 +26,9 @@ def tick_sparks args
       next
     end
 
+    spark.g = 511 * percentage
+    spark.b = 255 * percentage
     spark.a = 111 * percentage
-    spark.angle += percentage
   end
 end
 
@@ -54,7 +55,6 @@ def tick_shoots args
         start: args.state.tick_count,
         a: 111,
         angle: rand(360),
-        path: rand > 0.5 ? "sprites/square/orange.png" : "sprites/square/red.png"
       }
     end
   end
