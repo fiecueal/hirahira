@@ -2,6 +2,7 @@ GRAVITY = -2
 
 def launch args
   peak = rand(180) + 360
+  colors = [ :r, :g, :b ]
   args.state.shoots << {
     x: rand(1081) + 100, # cus apparently mruby doesn't accept ranges for rand
     y: 0,
@@ -10,7 +11,9 @@ def launch args
     ttl: peak / 13,
     start: args.state.tick_count,
     peak: peak,
-    primitive_marker: :solid
+    primitive_marker: :solid,
+    color1: colors[rand(3)],
+    color2: colors[rand(3)]
   }
 end
 
@@ -40,6 +43,8 @@ def tick_blooms args
       start: args.state.tick_count,
       a: 111,
       angle: rand(360),
+      color1: bloom.color1,
+      color2: bloom.color2
     }
   end
 end
@@ -63,6 +68,8 @@ def tick_shoots args
           start: args.state.tick_count,
           angle: (36 * i + rand(36)) * Math::PI / 180,
           primitive_marker: :solid,
+          color1: shoot.color1,
+          color2: shoot.color2,
         }
       end
       next
@@ -81,6 +88,8 @@ def tick_shoots args
         start: args.state.tick_count,
         a: 111,
         angle: rand(360),
+        color1: shoot.color1,
+        color2: shoot.color2
       }
     end
   end
@@ -98,8 +107,8 @@ def tick_sparks args
       next
     end
 
-    spark.g = 511 * percentage
-    spark.b = 255 * percentage
+    spark[spark.color1] = 512 * percentage
+    spark[spark.color2] = 256 * percentage
     spark.a = 111 * percentage
   end
 end
