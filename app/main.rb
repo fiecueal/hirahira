@@ -1,4 +1,4 @@
-GRAVITY = -0.01
+GRAVITY = -2
 
 def launch args
   peak = rand(180) + 360
@@ -16,6 +16,7 @@ end
 
 def tick_blooms args
   args.state.blooms.reverse_each do |bloom|
+    # puts bloom.class
     percentage = args.easing.ease(bloom.start,
                                   args.state.tick_count,
                                   bloom.ttl,
@@ -25,6 +26,9 @@ def tick_blooms args
       args.state.blooms.delete bloom
       next
     end
+
+    bloom.x += Math.cos(bloom.angle) * 20 * percentage
+    bloom.y += Math.sin(bloom.angle) * 20 * percentage + GRAVITY * (1 - percentage)
   end
 end
 
@@ -37,7 +41,18 @@ def tick_shoots args
 
     if percentage == 1
       args.state.shoots.delete shoot
-      # TODO: add blooms here
+      10.times do |i|
+        args.state.blooms << {
+          x: shoot.x,
+          y: shoot.y,
+          w: 10,
+          h: 10,
+          ttl: shoot.ttl * 2,
+          start: args.state.tick_count,
+          angle: (36 * i + rand(36)) * Math::PI / 180,
+          primitive_marker: :solid,
+        }
+      end
       next
     end
 
