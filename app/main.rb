@@ -8,7 +8,7 @@ def launch args
     y: 0,
     w: 10,
     h: 10,
-    ttl: peak / 13,
+    ttl: peak / (10 + rand(5)),
     start: args.state.tick_count,
     peak: peak,
     primitive_marker: :solid,
@@ -23,15 +23,15 @@ def tick_blooms args
     percentage = args.easing.ease(bloom.start,
                                   args.state.tick_count,
                                   bloom.ttl,
-                                  :flip, :cube)
+                                  :flip, bloom.easing)
 
     if percentage.zero?
       args.state.blooms.delete bloom
       next
     end
 
-    bloom.x += Math.cos(bloom.angle) * 20 * percentage
-    bloom.y += Math.sin(bloom.angle) * 20 * percentage + GRAVITY * (1 - percentage)
+    bloom.x += bloom.dx * percentage
+    bloom.y += bloom.dy * percentage + GRAVITY * (1 - percentage)
 
     size = rand(10) + 5
     args.state.sparks << {
@@ -58,7 +58,9 @@ def tick_shoots args
 
     if percentage == 1
       args.state.shoots.delete shoot
+      easing = [ :quad, :cube ]
       10.times do |i|
+        angle = (36 * i + rand(36)) * Math::PI / 180
         args.state.blooms << {
           x: shoot.x,
           y: shoot.y,
@@ -66,10 +68,12 @@ def tick_shoots args
           h: 10,
           ttl: shoot.ttl * 2,
           start: args.state.tick_count,
-          angle: (36 * i + rand(36)) * Math::PI / 180,
           primitive_marker: :solid,
+          dx: Math.cos(angle) * (rand(10) + 10),
+          dy: Math.sin(angle) * (rand(10) + 10),
           color1: shoot.color1,
           color2: shoot.color2,
+          easing: easing[rand(easing.size)],
         }
       end
       next
@@ -107,8 +111,8 @@ def tick_sparks args
       next
     end
 
-    spark[spark.color1] = 512 * percentage
-    spark[spark.color2] = 256 * percentage
+    spark[spark.color1] = 256 * (rand(2) + 1) * percentage
+    spark[spark.color2] = 256 * (rand(2) + 1) * percentage
     spark.a = 111 * percentage
   end
 end
