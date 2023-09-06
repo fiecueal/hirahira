@@ -10,8 +10,53 @@ def launch args
     ttl: peak / 13,
     start: args.state.tick_count,
     peak: peak,
-    primitive_marker: :sprite
+    primitive_marker: :solid
   }
+end
+
+def tick_blooms args
+  args.state.blooms.reverse_each do |bloom|
+    percentage = args.easing.ease(bloom.start,
+                                  args.state.tick_count,
+                                  bloom.ttl,
+                                  :flip, :cube)
+
+    if percentage.zero?
+      args.state.blooms.delete bloom
+      next
+    end
+  end
+end
+
+def tick_shoots args
+  args.state.shoots.reverse_each do |shoot|
+    percentage = args.easing.ease(shoot.start,
+                                  args.state.tick_count,
+                                  shoot.ttl,
+                                  :flip, :cube, :flip)
+
+    if percentage == 1
+      args.state.shoots.delete shoot
+      # TODO: add blooms here
+      next
+    end
+
+    shoot.y = shoot.peak * percentage
+
+    11.times do |i|
+      size = rand(20) + 10
+      args.state.sparks << {
+        x: shoot.x + rand(25) - 12,
+        y: shoot.y + rand(25) - 12,
+        w: size,
+        h: size,
+        ttl: shoot.ttl,
+        start: args.state.tick_count,
+        a: 111,
+        angle: rand(360),
+      }
+    end
+  end
 end
 
 def tick_sparks args
@@ -30,38 +75,6 @@ def tick_sparks args
     spark.b = 255 * percentage
     spark.a = 111 * percentage
   end
-end
-
-def tick_shoots args
-  args.state.shoots.reverse_each do |shoot|
-    shoot.y = shoot.peak * args.easing.ease(shoot.start,
-                                            args.state.tick_count,
-                                            shoot.ttl,
-                                            :flip, :cube, :flip)
-    if shoot.y == shoot.peak
-      args.state.shoots.delete shoot
-      next
-    end
-
-    shoot.x += Math.cos(args.state.tick_count) * 3
-    11.times do |i|
-      size = rand(20) + 10
-      args.state.sparks << {
-        x: shoot.x + rand(25) - 12,
-        y: shoot.y + rand(25) - 12,
-        w: size,
-        h: size,
-        ttl: shoot.ttl,
-        start: args.state.tick_count,
-        a: 111,
-        angle: rand(360),
-      }
-    end
-  end
-end
-
-def tick_blooms args
-
 end
 
 def tick args
