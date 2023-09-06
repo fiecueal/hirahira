@@ -29,6 +29,18 @@ def tick_blooms args
 
     bloom.x += Math.cos(bloom.angle) * 20 * percentage
     bloom.y += Math.sin(bloom.angle) * 20 * percentage + GRAVITY * (1 - percentage)
+
+    size = rand(10) + 5
+    args.state.sparks << {
+      x: bloom.x + rand(13) - 6,
+      y: bloom.y + rand(13) - 6,
+      w: size,
+      h: size,
+      ttl: bloom.ttl,
+      start: args.state.tick_count,
+      a: 111,
+      angle: rand(360),
+    }
   end
 end
 
@@ -58,7 +70,7 @@ def tick_shoots args
 
     shoot.y = shoot.peak * percentage
 
-    11.times do |i|
+    2.times do |i|
       size = rand(20) + 10
       args.state.sparks << {
         x: shoot.x + rand(25) - 12,
@@ -101,10 +113,14 @@ def tick args
   tick_shoots args
   tick_sparks args
 
-  launch args if args.state.shoots.empty?
+  launch args if args.state.sparks.empty?
+
+  args.state.max ||= 0
+  args.state.max = args.state.sparks.size if args.state.max < args.state.sparks.size
 
   args.outputs.background_color = [ 11, 17, 23 ]
   args.outputs.sprites << [ args.state.sparks ]
   args.outputs.debug << [ args.state.shoots, args.state.blooms ]
+  args.outputs.debug << { y: 100, text: "max sprites: #{args.state.max}", r: 255, g: 255, b: 255 }
   args.outputs.debug << args.gtk.framerate_diagnostics_primitives
 end
