@@ -81,21 +81,19 @@ def tick_shoots args
 
     shoot.y = shoot.peak * percentage
 
-    2.times do |i|
-      size = rand(20) + 10
-      args.state.sparks << {
-        x: shoot.x + rand(25) - 12,
-        y: shoot.y + rand(25) - 12,
-        w: size,
-        h: size,
-        ttl: shoot.ttl,
-        start: args.state.tick_count,
-        a: 111,
-        angle: rand(360),
-        color1: shoot.color1,
-        color2: shoot.color2
-      }
-    end
+    size = rand(20) + 10
+    args.state.sparks << {
+      x: shoot.x + rand(17) - 8,
+      y: shoot.y + rand(17) - 8,
+      w: size,
+      h: size,
+      ttl: shoot.ttl,
+      start: args.state.tick_count,
+      a: 111,
+      angle: rand(360),
+      color1: shoot.color1,
+      color2: shoot.color2
+    }
   end
 end
 
