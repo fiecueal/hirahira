@@ -25,7 +25,7 @@ def tick_blooms args
                                   bloom.ttl,
                                   :flip, bloom.easing)
 
-    if percentage.zero?
+    if percentage <= 0.1
       args.state.blooms.delete bloom
       next
     end
@@ -104,7 +104,7 @@ def tick_sparks args
                                   spark.ttl,
                                   :flip, :cube)
 
-    if percentage.zero?
+    if percentage <= 0.1
       args.state.sparks.delete spark
       next
     end
@@ -124,14 +124,11 @@ def tick args
   tick_shoots args
   tick_sparks args
 
-  launch args if args.state.sparks.empty?
-
-  args.state.max ||= 0
-  args.state.max = args.state.sparks.size if args.state.max < args.state.sparks.size
+  launch args if args.state.shoots.empty? && args.state.sparks.size < 384
 
   args.outputs.background_color = [ 11, 17, 23 ]
   args.outputs.sprites << [ args.state.sparks ]
-  args.outputs.debug << [ args.state.shoots, args.state.blooms ]
-  args.outputs.debug << { y: 100, text: "max sprites: #{args.state.max}", r: 255, g: 255, b: 255 }
-  args.outputs.debug << args.gtk.framerate_diagnostics_primitives
+  args.outputs.debug << { y: 20, text: args.state.sparks.size, r: 255, g: 255, b: 255 }
+  # args.outputs.debug << [ args.state.shoots, args.state.blooms ]
+  # args.outputs.debug << args.gtk.framerate_diagnostics_primitives
 end
