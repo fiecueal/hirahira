@@ -2,9 +2,9 @@
 devid=fiecueal
 devtitle=fiecueal
 gameid=hirahira
-gametitle=hirahira
-version=0.1
-icon=metadata/icon.png
+gametitle=ヒラヒラ
+version=1.0
+# icon=metadata/icon.png
 
 # === Flags available at all licensing tiers ===
 
